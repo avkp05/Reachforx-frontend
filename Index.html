@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReachForX | Automated Influencer Systems</title>
+    
+    <!-- NEW FAVICON TAG -->
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --emerald: #10b981;
+            --emerald-dark: #059669;
+            --bg-dark: #050505;
+            --card-bg: rgba(17, 24, 39, 0.6);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--emerald);
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.15);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 20px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        .marquee-content {
+            display: flex;
+            width: 200%;
+            animation: marquee 20s linear infinite;
+        }
+
+        /* Scroll Reveal Utility */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Canvas Background */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-emerald-500 selection:text-black">
+
+    <nav class="fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="glass border-b border-white/5">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+                <!-- NEW HEADER LOGO SECTION -->
+                <div class="flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <img src="Logo.png" alt="ReachForX Logo" class="h-10 md:h-12 w-auto drop-shadow-md">
+                </div>
+                <div class="hidden md:flex items-center gap-8 text-sm font-semibold uppercase tracking-wider text-gray-400">
+    <a href="#systems" class="hover:text-emerald-400 transition-colors">Our System</a>
+    <a href="#promise" class="hover:text-emerald-400 transition-colors">Our Promise</a>
+    <a href="#contact" class="hover:text-emerald-400 transition-colors">Apply</a>
+</div>
+
+                <a href="#contact"
+                    class="px-6 py-2.5 bg-emerald-500 text-black font-bold uppercase text-sm rounded hover:bg-emerald-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]">
+                    Contact Us
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative min-h-screen flex items-center pt-24 pb-12 overflow-hidden">
+        <!-- 3D Particle Background will render here -->
+        <canvas id="bg-canvas"></canvas>
+
+        <!-- Glowing Orbs -->
+        <div
+            class="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-600/20 rounded-full mix-blend-screen filter blur-[120px]">
+        </div>
+        <div
+            class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full mix-blend-screen filter blur-[120px]">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+                <div class="flex flex-col gap-8 reveal">
+
+                    <h1 class="text-5xl md:text-7xl font-black text-white leading-[1.1] tracking-tight">
+                        Scale With <br />
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-600">
+                            Precision.
+                        </span>
+                    </h1>
+
+                    <p class="text-xl text-gray-400 max-w-lg leading-relaxed font-light">
+                        We engineer automated outreach systems connecting brands with high-converting micro-influencers.
+                        Real data. Real revenue.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4 mt-4">
+                        <a href="#contact"
+                            class="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded text-center transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                            Initiate Strategy
+                        </a>
+                        <a href="#systems"
+                            class="px-8 py-4 glass hover:bg-white/5 border border-white/10 text-white font-bold rounded text-center transition-all">
+                            Explore Systems
+                        </a>
+                    </div>
+                </div>
+
+                <div class="relative w-full h-[500px] flex justify-center items-center reveal hidden lg:flex">
+                    <div class="relative w-full h-full animate-float">
+                        <!-- Abstract UI Card representation -->
+                        <div
+                            class="absolute top-10 right-10 glass p-6 rounded-2xl border border-emerald-500/30 shadow-2xl z-20 transform rotate-3 w-64">
+                            <div class="flex justify-between items-center mb-4">
+                                <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xs text-gray-400">Live ROI</span>
+                            </div>
+                            <div class="text-3xl font-black text-white">+184%</div>
+                            <div class="text-xs text-emerald-500 mt-1">Campaign Delta-7</div>
+                        </div>
+
+                        <!-- Abstract UI Card 2 -->
+                        <div
+                            class="absolute bottom-20 left-10 glass p-6 rounded-2xl border border-blue-500/30 shadow-2xl z-20 transform -rotate-6 w-72">
+                            <div class="text-xs text-gray-400 mb-2 uppercase tracking-widest">Network Reach</div>
+                            <div class="w-full bg-gray-800 rounded-full h-2 mb-4">
+                                <div class="bg-gradient-to-r from-blue-500 to-emerald-500 h-2 rounded-full w-3/4"></div>
+                            </div>
+                            <div class="flex justify-between text-xs font-bold">
+                                <span>Active Creators</span>
+                                <span class="text-emerald-400">500+</span>
+                            </div>
+                        </div>
+
+                        <!-- Central Graphic Element -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div
+                                class="w-64 h-64 border border-white/10 rounded-full flex items-center justify-center animate-[spin_20s_linear_infinite]">
+                                <div
+                                    class="w-48 h-48 border border-emerald-500/30 rounded-full flex items-center justify-center animate-[spin_15s_linear_infinite_reverse]">
+                                    <div
+                                        class="w-32 h-32 bg-gradient-to-tr from-emerald-500/20 to-blue-500/20 rounded-full blur-xl">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <div class="w-full bg-emerald-500 py-3 overflow-hidden transform -rotate-1 scale-105 relative z-20 shadow-2xl">
+        <div class="marquee-content">
+            <!-- Repeated text for seamless loop -->
+            <span class="text-black font-black text-xl uppercase mx-8 tracking-widest flex-shrink-0">Reach. Connect.
+                Grow. <span class="mx-8 opacity-50">•</span> Data-Driven Acquisition <span
+                    class="mx-8 opacity-50">•</span> Bypassing the Noise <span class="mx-8 opacity-50">•</span></span>
+            <span class="text-black font-black text-xl uppercase mx-8 tracking-widest flex-shrink-0">Reach. Connect.
+                Grow. <span class="mx-8 opacity-50">•</span> Data-Driven Acquisition <span
+                    class="mx-8 opacity-50">•</span> Bypassing the Noise <span class="mx-8 opacity-50">•</span></span>
+        </div>
+    </div>
+
+    <section id="systems" class="py-32 relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20 reveal">
+                <h2 class="text-xs font-bold text-emerald-500 tracking-widest uppercase mb-3">Our Systems</h2>
+                <h3 class="text-4xl md:text-5xl font-black text-white mb-6">Engineered for Scale.</h3>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">Not just an agency. We build bespoke acquisition
+                    engines that turn attention into trackable revenue.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div
+                    class="md:col-span-2 glass glass-card p-10 rounded-2xl transition-all duration-300 reveal relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-all">
+                    </div>
+                    <div class="relative z-10">
+                        <div
+                            class="w-14 h-14 bg-emerald-500/10 rounded flex items-center justify-center mb-8 border border-emerald-500/20">
+                            <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-2xl font-bold text-white mb-4">Hyper-Niche Discovery Engine</h4>
+                        <p class="text-gray-400 mb-6 max-w-md">We bypass overpriced macro-influencers. Our systems
+                            scrape and vet high-engagement micro-creators tailored precisely to your customer
+                            demographic.</p>
+                        <ul class="space-y-3 text-sm text-gray-300 font-semibold">
+                            <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg> Audience Authenticity Checks</li>
+                            <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg> Sentiment Analysis</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass glass-card p-10 rounded-2xl transition-all duration-300 reveal group">
+                    <div
+                        class="w-14 h-14 bg-blue-500/10 rounded flex items-center justify-center mb-8 border border-blue-500/20">
+                        <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-4">Automated DM Funnels</h4>
+                    <p class="text-gray-400 text-sm">High-volume, personalized outreach. We handle the conversation,
+                        negotiation, and contracting automatically at scale.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass glass-card p-10 rounded-2xl transition-all duration-300 reveal group">
+                    <div
+                        class="w-14 h-14 bg-purple-500/10 rounded flex items-center justify-center mb-8 border border-purple-500/20">
+                        <svg class="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white mb-4">Conversion Tracking</h4>
+                    <p class="text-gray-400 text-sm">Real-time attribution. We see exactly which creator drove the sale,
+                        allowing us to double down on winning verticals instantly.</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div
+                    class="md:col-span-2 glass glass-card p-10 rounded-2xl transition-all duration-300 reveal relative overflow-hidden flex flex-col justify-center border-l-4 border-l-emerald-500">
+                    <h4 class="text-2xl font-bold text-white mb-2">Scaling Without the Noise</h4>
+                    <p class="text-gray-400">Authentic connections. Trackable conversions. Zero marketing fluff. We
+                        build bespoke acquisition engines tailored specifically to bypass vanity metrics and turn your
+                        exact target demographic into loyal customers.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Our Promise Section -->
+    <section id="promise" class="py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+
+            <!-- Section Header -->
+            <div class="text-center mb-16 reveal">
+                <div class="flex items-center justify-center gap-4 mb-4">
+                    <div class="h-px w-8 bg-emerald-500/50"></div>
+                    <span class="text-xs font-bold text-emerald-500 tracking-widest uppercase">Our Promise</span>
+                    <div class="h-px w-8 bg-emerald-500/50"></div>
+                </div>
+                <h3 class="text-4xl md:text-5xl font-black text-white mb-4">
+                    Zero Risk. <span class="text-emerald-500">Full Transparency.</span>
+                </h3>
+                <p class="text-gray-400 text-lg">We stand behind every campaign with our quality guarantee.</p>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+
+                <!-- Card 1 -->
+                <div class="glass glass-card p-8 rounded-2xl text-center reveal group flex flex-col items-center">
+                    <div
+                        class="w-16 h-16 rounded-full bg-black/60 border border-white/5 flex items-center justify-center mb-6 relative shadow-[0_0_15px_rgba(16,185,129,0.05)] group-hover:shadow-[0_0_25px_rgba(16,185,129,0.2)] transition-all">
+                        <svg class="w-7 h-7 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-3">Secure Payments</h4>
+                    <p class="text-sm text-gray-400 leading-relaxed">All transactions are protected and verified
+                        end-to-end.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass glass-card p-8 rounded-2xl text-center reveal group flex flex-col items-center"
+                    style="transition-delay: 100ms;">
+                    <div
+                        class="w-16 h-16 rounded-full bg-black/60 border border-white/5 flex items-center justify-center mb-6 relative shadow-[0_0_15px_rgba(16,185,129,0.05)] group-hover:shadow-[0_0_25px_rgba(16,185,129,0.2)] transition-all">
+                        <svg class="w-7 h-7 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
+                            </path>
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-3">No Fake Engagement</h4>
+                    <p class="text-sm text-gray-400 leading-relaxed">We only work with authentic creators with real
+                        audiences.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass glass-card p-8 rounded-2xl text-center reveal group flex flex-col items-center"
+                    style="transition-delay: 200ms;">
+                    <div
+                        class="w-16 h-16 rounded-full bg-black/60 border border-white/5 flex items-center justify-center mb-6 relative shadow-[0_0_15px_rgba(16,185,129,0.05)] group-hover:shadow-[0_0_25px_rgba(16,185,129,0.2)] transition-all">
+                        <svg class="w-7 h-7 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20.618 10A9.957 9.957 0 0012 2C6.477 2 2 6.477 2 12v3a4 4 0 004 4h1a1 1 0 001-1v-4a1 1 0 00-1-1H4v-1a8 8 0 0116 0v1h-3a1 1 0 00-1 1v4a1 1 0 001 1h1a4 4 0 004-4v-3c0-.342-.034-.678-.1-1z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-3">Dedicated Manager</h4>
+                    <p class="text-sm text-gray-400 leading-relaxed">A personal account manager for every single
+                        campaign.</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="glass glass-card p-8 rounded-2xl text-center reveal group flex flex-col items-center"
+                    style="transition-delay: 300ms;">
+                    <div
+                        class="w-16 h-16 rounded-full bg-black/60 border border-white/5 flex items-center justify-center mb-6 relative shadow-[0_0_15px_rgba(16,185,129,0.05)] group-hover:shadow-[0_0_25px_rgba(16,185,129,0.2)] transition-all">
+                        <svg class="w-7 h-7 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-3">Real-Time Reports</h4>
+                    <p class="text-sm text-gray-400 leading-relaxed">Live campaign tracking and performance analytics
+                        always.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Creator Intelligence (Testimonials) Section -->
+    <section id="creator-testimonials" class="py-24 relative z-10 overflow-hidden">
+        <!-- Background Ambient Glow -->
+        <div
+            class="absolute top-1/2 left-0 w-[600px] h-[600px] bg-blue-900/10 rounded-full blur-[120px] pointer-events-none -translate-x-1/3 -translate-y-1/2">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center mb-16 reveal">
+                <div class="flex items-center justify-center gap-4 mb-4">
+                    <div class="h-px w-8 bg-blue-500/50"></div>
+                    <span class="text-xs font-bold text-blue-500 tracking-widest uppercase">Network Feedback</span>
+                    <div class="h-px w-8 bg-blue-500/50"></div>
+                </div>
+                <h3 class="text-4xl md:text-5xl font-black text-white mb-4">
+                    Empowering <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-500">Creators.</span>
+                </h3>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">See why high-converting micro-influencers across all
+                    platforms prefer building trust through ReachForX.</p>
+            </div>
+
+            <!-- Testimonials Grid (6 Cards) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Card 1: Instagram (Beauty) -->
+                <div class="glass glass-card p-8 rounded-2xl reveal flex flex-col justify-between group">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <div
+                                class="text-emerald-500 text-lg tracking-widest group-hover:scale-105 transition-transform origin-left">
+                                ★★★★★
+                            </div>
+                            <span
+                                class="text-xs font-bold text-pink-500 bg-pink-500/10 px-2 py-1 rounded uppercase tracking-wider">Instagram</span>
+                        </div>
+                        <p class="text-gray-300 text-sm leading-relaxed mb-8 font-light">
+                            "ReachForX matched me with D2C brands that actually fit my beauty niche. No more awkward
+                            scripts, just genuine product seeding. The process was seamless and the retainer-free model
+                            gives me so much creative freedom."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4 border-t border-white/5 pt-6">
+                        <div
+                            class="w-12 h-12 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-500 font-bold text-lg border border-pink-500/20">
+                            S
+                        </div>
+                        <div>
+                            <h5 class="text-white font-bold text-sm">Sarah J.</h5>
+                            <span class="text-xs text-gray-500">Beauty Creator • 45k Followers</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: YouTube (Tech/Lifestyle) -->
+                <div class="glass glass-card p-8 rounded-2xl reveal flex flex-col justify-between group"
+                    style="transition-delay: 100ms;">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <div
+                                class="text-emerald-500 text-lg tracking-widest group-hover:scale-105 transition-transform origin-left">
+                                ★★★★★
+                            </div>
+                            <span
+                                class="text-xs font-bold text-red-500 bg-red-500/10 px-2 py-1 rounded uppercase tracking-wider">YouTube</span>
+                        </div>
+                        <p class="text-gray-300 text-sm leading-relaxed mb-8 font-light">
+                            "I've worked with dozens of agencies, but the automated DM and contracting funnel here is
+                            next level. I received the product, filmed my review, and got my analytics tracked without a
+                            single stressful follow-up email."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4 border-t border-white/5 pt-6">
+                        <div
+                            class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 font-bold text-lg border border-red-500/20">
+                            R
+                        </div>
+                        <div>
+                            <h5 class="text-white font-bold text-sm">Rahul M.</h5>
+                            <span class="text-xs text-gray-500">Tech Reviewer • 120k Subs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: TikTok/Shorts (Fashion) -->
+                <div class="glass glass-card p-8 rounded-2xl reveal flex flex-col justify-between group"
+                    style="transition-delay: 200ms;">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <div
+                                class="text-emerald-500 text-lg tracking-widest group-hover:scale-105 transition-transform origin-left">
+                                ★★★★★
+                            </div>
+                            <span
+                                class="text-xs font-bold text-blue-400 bg-blue-400/10 px-2 py-1 rounded uppercase tracking-wider">Short-Form</span>
+                        </div>
+                        <p class="text-gray-300 text-sm leading-relaxed mb-8 font-light">
+                            "Finally, an agency that respects micro-creators! They don't treat us like billboards. My
+                            dedicated campaign manager is super responsive, and the secure payment system means I never
+                            have to chase invoices."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4 border-t border-white/5 pt-6">
+                        <div
+                            class="w-12 h-12 rounded-full bg-blue-400/10 flex items-center justify-center text-blue-400 font-bold text-lg border border-blue-400/20">
+                            E
+                        </div>
+                        <div>
+                            <h5 class="text-white font-bold text-sm">Elena T.</h5>
+                            <span class="text-xs text-gray-500">Style Vlogger • 80k Followers</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Instagram (Fitness) -->
+                <div class="glass glass-card p-8 rounded-2xl reveal flex flex-col justify-between group"
+                    style="transition-delay: 300ms;">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <div
+                                class="text-emerald-500 text-lg tracking-widest group-hover:scale-105 transition-transform origin-left">
+                                ★★★★★
+                            </div>
+                            <span
+                                class="text-xs font-bold text-pink-500 bg-pink-500/10 px-2 py-1 rounded uppercase tracking-wider">Instagram</span>
+                        </div>
+                        <p class="text-gray-300 text-sm leading-relaxed mb-8 font-light">
+                            "The transparency is what keeps me coming back. Real-time tracking links mean I can actually
+                            see the conversions I'm driving for the supplement brands they connect me with. It makes
+                            proving my ROI so easy."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4 border-t border-white/5 pt-6">
+                        <div
+                            class="w-12 h-12 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-500 font-bold text-lg border border-pink-500/20">
+                            D
+                        </div>
+                        <div>
+                            <h5 class="text-white font-bold text-sm">David K.</h5>
+                            <span class="text-xs text-gray-500">Fitness Coach • 65k Followers</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5: YouTube (Skincare) -->
+                <div class="glass glass-card p-8 rounded-2xl reveal flex flex-col justify-between group"
+                    style="transition-delay: 400ms;">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <div
+                                class="text-emerald-500 text-lg tracking-widest group-hover:scale-105 transition-transform origin-left">
+                                ★★★★★
+                            </div>
+                            <span
+                                class="text-xs font-bold text-red-500 bg-red-500/10 px-2 py-1 rounded uppercase tracking-wider">YouTube</span>
+                        </div>
+                        <p class="text-gray-300 text-sm leading-relaxed mb-8 font-light">
+                            "I love that they focus on hyper-niche matching. I only get pitched products with actual
+                            clinical backing, which protects my trust with my audience. Zero fake engagement forced on
+                            me, just pure authentic reviews."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4 border-t border-white/5 pt-6">
+                        <div
+                            class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 font-bold text-lg border border-red-500/20">
+                            A
+                        </div>
+                        <div>
+                            <h5 class="text-white font-bold text-sm">Ananya S.</h5>
+                            <span class="text-xs text-gray-500">Skincare Enthusiast • 95k Subs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6: TikTok (Men's Grooming) -->
+                <div class="glass glass-card p-8 rounded-2xl reveal flex flex-col justify-between group"
+                    style="transition-delay: 500ms;">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <div
+                                class="text-emerald-500 text-lg tracking-widest group-hover:scale-105 transition-transform origin-left">
+                                ★★★★★
+                            </div>
+                            <span
+                                class="text-xs font-bold text-blue-400 bg-blue-400/10 px-2 py-1 rounded uppercase tracking-wider">Short-Form</span>
+                        </div>
+                        <p class="text-gray-300 text-sm leading-relaxed mb-8 font-light">
+                            "As a smaller creator, getting noticed by premium brands is hard. ReachForX's discovery
+                            engine put my content right in front of the decision-makers. It has been the best
+                            barter-to-paid pipeline I've experienced."
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4 border-t border-white/5 pt-6">
+                        <div
+                            class="w-12 h-12 rounded-full bg-blue-400/10 flex items-center justify-center text-blue-400 font-bold text-lg border border-blue-400/20">
+                            M
+                        </div>
+                        <div>
+                            <h5 class="text-white font-bold text-sm">Marcus V.</h5>
+                            <span class="text-xs text-gray-500">Lifestyle Creator • 30k Followers</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="py-24 relative overflow-hidden">
+        <!-- Background Glow -->
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-900/10 rounded-full blur-[100px] pointer-events-none">
+        </div>
+
+        <div class="max-w-4xl mx-auto px-6 relative z-10 reveal">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-black mb-4 text-white">Join the Network.</h2>
+                <p class="text-gray-400">Select your profile below to initiate the vetting process.</p>
+            </div>
+
+            <div class="glass rounded-2xl p-2 mb-8 flex max-w-sm mx-auto border border-white/10">
+                <button id="tab-brand" onclick="switchTab('brand')"
+                    class="flex-1 py-3 text-sm font-bold rounded bg-emerald-500 text-black transition-all">I am a
+                    Brand</button>
+                <button id="tab-creator" onclick="switchTab('creator')"
+                    class="flex-1 py-3 text-sm font-bold rounded text-gray-400 hover:text-white transition-all">I am a
+                    Creator</button>
+            </div>
+
+            <!-- Brand Form -->
+            <div id="form-brand" class="glass p-8 md:p-12 rounded-2xl border border-white/10 animate-fade-in">
+                <form onsubmit="handleFormSubmit(event, 'brand')" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Full
+                                Name</label>
+                            <input type="text" required
+                                class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Work
+                                Email</label>
+                            <input type="email" required
+                                class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Company
+                            Website</label>
+                        <input type="url" placeholder="https://" required
+                            class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Current
+                            Monthly Revenue</label>
+                        <select required
+                            class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-gray-300 focus:outline-none focus:border-emerald-500 transition-colors appearance-none">
+                            <option value="" disabled selected>Select an option...</option>
+                            <option value="1">Under $10k / mo</option>
+                            <option value="2">$10k - $50k / mo</option>
+                            <option value="3">$50k - $200k / mo</option>
+                            <option value="4">$200k+ / mo</option>
+                        </select>
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-4 rounded transition-all uppercase tracking-widest mt-4">
+                        Request Strategy Audit
+                    </button>
+                </form>
+            </div>
+
+            <!-- Creator Form (Hidden by default) -->
+            <div id="form-creator" class="glass p-8 md:p-12 rounded-2xl border border-white/10 hidden animate-fade-in">
+                <form onsubmit="handleFormSubmit(event, 'creator')" class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Primary Social
+                            Handle</label>
+                        <input type="text" placeholder="@username" required
+                            class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Platform</label>
+                            <select required
+                                class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-gray-300 focus:outline-none focus:border-blue-500 transition-colors appearance-none">
+                                <option value="instagram">Instagram</option>
+                                <option value="tiktok">TikTok</option>
+                                <option value="youtube">YouTube</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Total
+                                Followers</label>
+                            <input type="number" required
+                                class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Email
+                            Address</label>
+                        <input type="email" required
+                            class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-blue-500 hover:bg-blue-400 text-black font-bold py-4 rounded transition-all uppercase tracking-widest mt-4">
+                        Apply to Roster
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black py-16 border-t border-white/10 relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 mb-12">
+
+                <!-- Column 1: Brand & Tagline -->
+                <div class="flex flex-col items-start text-left">
+                    <div class="mb-5 cursor-pointer" onclick="window.scrollTo(0,0)">
+                        <img src="Logo.png" alt="ReachForX Logo"
+                            class="h-10 w-auto opacity-90 hover:opacity-100 transition-opacity duration-300">
+                    </div>
+                    <p class="text-gray-500 text-sm leading-relaxed max-w-xs">
+                        Building influence that converts. India's premier influencer marketing agency.
+                    </p>
+                </div>
+
+                <!-- Column 2: Quick Links -->
+                <div class="flex flex-col items-start text-left">
+                    <h4 class="text-white font-bold mb-6 text-sm tracking-wide">Quick Links</h4>
+                    <ul class="space-y-4 text-gray-500 text-sm">
+                        <li><a href="#contact" onclick="switchTab('brand')"
+                                class="hover:text-emerald-500 transition-colors">For Brands</a></li>
+                        <li><a href="#contact" onclick="switchTab('creator')"
+                                class="hover:text-emerald-500 transition-colors">For Creators</a></li>
+                        <li><a href="#systems" class="hover:text-emerald-500 transition-colors">Our Work</a></li>
+                        <li><a href="#contact" class="hover:text-emerald-500 transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Contact Info -->
+                <div class="flex flex-col items-start text-left">
+                    <h4 class="text-white font-bold mb-6 text-sm tracking-wide">Get In Touch</h4>
+                    <ul class="space-y-4 text-gray-500 text-sm">
+                        <li><a href="mailto:anurag@reachforx.in"
+                                class="hover:text-emerald-500 transition-colors">hello@reachforx.in</a></li>
+                        <li><a href="tel:+917400667519" class="hover:text-emerald-500 transition-colors"></a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Bottom Copyright Separator -->
+            <div class="border-t border-white/10 pt-8 flex justify-center">
+                <p class="text-gray-600 text-sm">&copy; 2026 ReachForX Strategic Operations. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Toast Notification -->
+    <div id="toast"
+        class="fixed bottom-5 right-5 glass border-l-4 border-emerald-500 text-white px-6 py-4 rounded shadow-2xl transform translate-y-20 opacity-0 transition-all duration-500 z-50 flex items-center gap-3">
+        <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <div>
+            <h4 class="font-bold text-sm">Transmission Received</h4>
+            <p class="text-xs text-gray-400">Our systems are processing your request.</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. Scroll Reveal Logic
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal(); // Trigger on load
+
+        // Navbar styling on scroll
+        window.addEventListener("scroll", function () {
+            const nav = document.getElementById("navbar");
+            if (window.scrollY > 50) {
+                nav.classList.add("shadow-lg", "bg-black/50");
+            } else {
+                nav.classList.remove("shadow-lg", "bg-black/50");
+            }
+        });
+
+        // 2. Tab Switching Logic
+        function switchTab(type) {
+            const btnBrand = document.getElementById('tab-brand');
+            const btnCreator = document.getElementById('tab-creator');
+            const formBrand = document.getElementById('form-brand');
+            const formCreator = document.getElementById('form-creator');
+
+            if (type === 'brand') {
+                btnBrand.className = "flex-1 py-3 text-sm font-bold rounded bg-emerald-500 text-black transition-all";
+                btnCreator.className = "flex-1 py-3 text-sm font-bold rounded text-gray-400 hover:text-white transition-all";
+                formBrand.classList.remove('hidden');
+                formCreator.classList.add('hidden');
+            } else {
+                btnCreator.className = "flex-1 py-3 text-sm font-bold rounded bg-blue-500 text-black transition-all";
+                btnBrand.className = "flex-1 py-3 text-sm font-bold rounded text-gray-400 hover:text-white transition-all";
+                formCreator.classList.remove('hidden');
+                formBrand.classList.add('hidden');
+            }
+        }
+
+        // 3. Form Submission Logic with Toast
+        function handleFormSubmit(e, type) {
+            e.preventDefault();
+            const form = e.target;
+            const toast = document.getElementById('toast');
+
+            // Adjust toast color based on type
+            if (type === 'creator') {
+                toast.classList.replace('border-emerald-500', 'border-blue-500');
+                toast.querySelector('svg').classList.replace('text-emerald-500', 'text-blue-500');
+            } else {
+                toast.classList.replace('border-blue-500', 'border-emerald-500');
+                toast.querySelector('svg').classList.replace('text-blue-500', 'text-emerald-500');
+            }
+
+            // Show Toast
+            toast.classList.remove('translate-y-20', 'opacity-0');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                form.reset();
+            }, 4000);
+        }
+
+        window.onload = function () {
+            const canvas = document.getElementById('bg-canvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Create Particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 700; // Amount of nodes
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                // Spread particles widely
+                posArray[i] = (Math.random() - 0.5) * 15;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            // Material for particles
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.02,
+                color: 0x10b981, // Emerald Green
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+
+            // Create Mesh
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+
+            camera.position.z = 3;
+
+            // Mouse interaction logic
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - windowHalfX);
+                mouseY = (event.clientY - windowHalfY);
+            });
+
+            // Animation Loop
+            const clock = new THREE.Clock();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                const elapsedTime = clock.getElapsedTime();
+
+                // Gentle constant rotation
+                particlesMesh.rotation.y = elapsedTime * 0.05;
+                particlesMesh.rotation.x = elapsedTime * 0.02;
+
+                // Mouse interaction - smooth easing
+                targetX = mouseX * 0.001;
+                targetY = mouseY * 0.001;
+
+                particlesMesh.rotation.y += 0.05 * (targetX - particlesMesh.rotation.y);
+                particlesMesh.rotation.x += 0.05 * (targetY - particlesMesh.rotation.x);
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Handle Resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+    </script>
+</body>
+
+</html>
