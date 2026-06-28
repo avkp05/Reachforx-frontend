@@ -672,34 +672,29 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Full
                                 Name</label>
-                            <input type="text" required
-                                class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                            <input type="text" id="brand-name" required class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Work
                                 Email</label>
-                            <input type="email" required
-                                class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                           <input type="email" id="brand-email" required class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors">
                         </div>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Company
                             Website</label>
-                        <input type="url" placeholder="https://" required
-                            class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                        <input type="url" id="brand-website" placeholder="https://" required class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Current
-                            Monthly Revenue</label>
-                        <select required
-                            class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-gray-300 focus:outline-none focus:border-emerald-500 transition-colors appearance-none">
-                            <option value="" disabled selected>Select an option...</option>
-                            <option value="1">Under $10k / mo</option>
-                            <option value="2">$10k - $50k / mo</option>
-                            <option value="3">$50k - $200k / mo</option>
-                            <option value="4">$200k+ / mo</option>
-                        </select>
-                    </div>
+    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Current Monthly Revenue</label>
+    <select id="brand-revenue" required class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-gray-300 focus:outline-none focus:border-emerald-500 transition-colors appearance-none">
+        <option value="" disabled selected>Select an option...</option>
+        <option value="1">Under $10k / mo</option>
+        <option value="2">$10k - $50k / mo</option>
+        <option value="3">$50k - $200k / mo</option>
+        <option value="4">$200k+ / mo</option>
+    </select>
+</div>
                     <button type="submit"
                         class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-4 rounded transition-all uppercase tracking-widest mt-4">
                         Request Strategy Audit
@@ -713,32 +708,27 @@
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Primary Social
                             Handle</label>
-                        <input type="text" placeholder="@username" required
-                            class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
+                        <input type="text" id="creator-handle" placeholder="@username" required class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label
-                                class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Platform</label>
-                            <select required
-                                class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-gray-300 focus:outline-none focus:border-blue-500 transition-colors appearance-none">
-                                <option value="instagram">Instagram</option>
-                                <option value="tiktok">TikTok</option>
-                                <option value="youtube">YouTube</option>
-                            </select>
-                        </div>
+    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Platform</label>
+    <select id="creator-platform" required class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-gray-300 focus:outline-none focus:border-blue-500 transition-colors appearance-none">
+        <option value="instagram">Instagram</option>
+        <option value="tiktok">TikTok</option>
+        <option value="youtube">YouTube</option>
+    </select>
+</div>
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Total
                                 Followers</label>
-                            <input type="number" required
-                                class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
+                            <input type="number" id="creator-followers" required class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
                         </div>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Email
                             Address</label>
-                        <input type="email" required
-                            class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
+                       <input type="email" id="creator-email" required class="w-full bg-black/50 border border-white/10 rounded px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
                     </div>
                     <button type="submit"
                         class="w-full bg-blue-500 hover:bg-blue-400 text-black font-bold py-4 rounded transition-all uppercase tracking-widest mt-4">
